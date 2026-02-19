@@ -18,6 +18,35 @@
 
 <!-- Step 2: Calculate and display the balances -->
 
+<% accounts = Hash.new %>
+<% for user in User.all %>
+  <% user_id = user["id"] %>
+  <% accounts[user_id] = 0 %>
+<% end %>
+
+<% for transaction in Transaction.all %>
+  <% if !transaction["from_user_id"].nil? %>
+    <% accounts[transaction["from_user_id"]] -= transaction["amount"] %>
+  <% end %>
+
+  <% accounts[transaction["to_user_id"]] += transaction["amount"] %>
+<% end %>
+
+Balances for each user:
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Balance</th>
+  </tr>
+  <% accounts.each do |user_id, balance| %>
+    <% acct = User.find_by({ "id" => user_id }) %>
+    <tr>
+      <td><%= acct["name"] %></td>
+      <td><%= balance %> KC</td>
+    </tr>
+  <% end %>
+</table>
+
 <!-- 
 Expected balances:
 Balance for Brian: 1348 KC
